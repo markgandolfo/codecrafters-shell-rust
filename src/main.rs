@@ -1,5 +1,6 @@
 use std::env;
 use std::io::{self, Write};
+use std::process::Command;
 
 const COMMANDS: [&str; 3] = ["exit", "echo", "type"];
 
@@ -47,33 +48,25 @@ fn handle_input(input: &str) {
                     Some(path) => println!("{} is {}", command, path),
                     _ => println!("{}: not found", command),
                 }
-                // match env::var("PATH")
-                //     .unwrap()
-                //     .split(":")
-                //     .map(|path| format!("{}/{}", path, command))
-                //     .find(|path| std::fs::metadata(path).is_ok())
-                // {
-                //     Some(path) => println!("{} is {}", command, path),
-                //     _ => println!("{}: not found", command),
-                // }
             }
         }
-        // command => println!("{}: not found", command.join(" ")),
-        command => {
-            let cmd_string = command.join(" ");
-            match find_in_path(
-                env::var("PATH").unwrap_or_else(|_| "".to_string()).as_str(),
-                &cmd_string,
-            ) {
-                Some(path) => {
-                    let mut cmd = std::process::Command::new(path);
-                    let status = cmd.status().unwrap();
-                    if !status.success() {
-                        println!("{}: not found", cmd_string);
+        command => match command {
+            [cmd, rest @ ..] => {
+                match find_in_path(
+                    env::var("PATH").unwrap_or_else(|_| "".to_string()).as_str(),
+                    cmd,
+                ) {
+                    Some(path) => {
+                        let result = Command::new(path)
+                            .args(rest)
+                            .status()
+                            .expect("failed to execute process");
+                        println!("{}", result);
                     }
+                    _ => println!("{}: command not found", cmd),
                 }
-                _ => println!("{}: command not found", cmd_string),
             }
-        }
+            _ => println!("{}: not found", command.join(" ")),
+        },
     }
 }
