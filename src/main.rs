@@ -34,7 +34,7 @@ fn handle_input(input: &str) {
                     .find(|path| std::fs::metadata(path).is_ok())
                 {
                     Some(path) => println!("{} is {}", command, path),
-                    _ => println!("{}: command not found", command),
+                    _ => println!("{}: not found", command),
                 }
             }
         }
