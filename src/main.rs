@@ -6,7 +6,6 @@ fn main() {
         print!("$ ");
         io::stdout().flush().unwrap();
 
-        // Wait for user input
         let stdin = io::stdin();
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
@@ -20,12 +19,8 @@ fn handle_input(input: &str) {
     let input: Vec<&str> = input.split_whitespace().collect();
 
     match input.as_slice() {
-        ["exit", code] => {
-            let code: i32 = code.parse().unwrap_or(0);
-            std::process::exit(code);
-        }
-        command => {
-            println!("{}: command not found", command.join(" "));
-        }
+        ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
+        ["echo", ..] => println!("{}", input[1..].join(" ")),
+        command => println!("{}: command not found", command.join(" ")),
     }
 }
