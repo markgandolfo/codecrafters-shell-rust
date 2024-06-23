@@ -29,7 +29,6 @@ fn handle_input(input: &str) {
             } else {
                 println!("{}: not found", command);
             }
-            println!("{} is a shell builtin", command)
         }
         command => println!("{}: command not found", command.join(" ")),
     }
