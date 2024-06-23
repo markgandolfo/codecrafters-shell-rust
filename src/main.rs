@@ -56,14 +56,14 @@ fn handle_input(input: &str) {
                     env::var("PATH").unwrap_or_else(|_| "".to_string()).as_str(),
                     cmd,
                 ) {
-                    Some(path) => {
-                        let result = Command::new(path)
-                            .args(rest)
-                            .status()
-                            .expect("failed to execute process");
-                        println!("{}", result);
-                    }
-                    _ => println!("{}: command not found", cmd),
+                    Some(path) => match Command::new(path).args(rest).output() {
+                        Ok(output) => {
+                            io::stdout().write_all(&output.stdout).unwrap();
+                            io::stderr().write_all(&output.stderr).unwrap();
+                        }
+                        Err(e) => eprintln!("{}", e),
+                    },
+                    None => println!("{}: command not found", cmd),
                 }
             }
             _ => println!("{}: not found", command.join(" ")),
