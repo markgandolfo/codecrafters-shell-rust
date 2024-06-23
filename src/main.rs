@@ -22,7 +22,6 @@ fn handle_input(input: &str) {
     match input.as_slice() {
         ["exit", code] => {
             let code: i32 = code.parse().unwrap_or(0);
-            println!("Goodbye!");
             std::process::exit(code);
         }
         command => {
