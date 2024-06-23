@@ -1,4 +1,4 @@
-#[allow(unused_imports)]
+use std::env;
 use std::io::{self, Write};
 
 const COMMANDS: [&str; 3] = ["exit", "echo", "type"];
@@ -27,7 +27,15 @@ fn handle_input(input: &str) {
             if COMMANDS.contains(&command) {
                 println!("{} is a shell builtin", command);
             } else {
-                println!("{}: not found", command);
+                match env::var("PATH")
+                    .unwrap()
+                    .split(":")
+                    .map(|path| format!("{}/{}", path, command))
+                    .find(|path| std::fs::metadata(path).is_ok())
+                {
+                    Some(path) => println!("{} is {}", command, path),
+                    _ => println!("{}: command not found", command),
+                }
             }
         }
         command => println!("{}: command not found", command.join(" ")),
