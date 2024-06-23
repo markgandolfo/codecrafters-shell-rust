@@ -2,7 +2,7 @@ use std::env;
 use std::io::{self, Write};
 use std::process::Command;
 
-const COMMANDS: [&str; 3] = ["exit", "echo", "type"];
+const COMMANDS: [&str; 4] = ["exit", "echo", "type", "pwd"];
 
 fn main() {
     loop {
@@ -37,6 +37,7 @@ fn handle_input(input: &str) {
     match input.as_slice() {
         ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
         ["echo", ..] => println!("{}", input[1..].join(" ")),
+        ["pwd"] => println!("{}", env::current_dir().unwrap().to_string_lossy()),
         ["type", command] => {
             if COMMANDS.contains(&command) {
                 println!("{} is a shell builtin", command);
