@@ -38,6 +38,6 @@ fn handle_input(input: &str) {
                 }
             }
         }
-        command => println!("{}: command not found", command.join(" ")),
+        command => println!("{}: not found", command.join(" ")),
     }
 }
