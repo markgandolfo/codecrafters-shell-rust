@@ -1,6 +1,8 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
+const COMMANDS: [&str; 3] = ["exit", "echo", "type"];
+
 fn main() {
     loop {
         print!("$ ");
@@ -21,6 +23,14 @@ fn handle_input(input: &str) {
     match input.as_slice() {
         ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
         ["echo", ..] => println!("{}", input[1..].join(" ")),
+        ["type", command] => {
+            if COMMANDS.contains(&command) {
+                println!("{} is a shell builtin", command);
+            } else {
+                println!("{}: not found", command);
+            }
+            println!("{} is a shell builtin", command)
+        }
         command => println!("{}: command not found", command.join(" ")),
     }
 }
