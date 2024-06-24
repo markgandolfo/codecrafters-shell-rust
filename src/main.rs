@@ -31,13 +31,17 @@ fn find_in_path(path_var: &str, filename: &str) -> Option<String> {
     None
 }
 
+fn pwd() -> String {
+    env::current_dir().unwrap().to_string_lossy().to_string()
+}
+
 fn handle_input(input: &str) {
     let input: Vec<&str> = input.split_whitespace().collect();
 
     match input.as_slice() {
         ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
         ["echo", ..] => println!("{}", input[1..].join(" ")),
-        ["pwd"] => println!("{}", env::current_dir().unwrap().to_string_lossy()),
+        ["pwd"] => println!("{}", pwd()),
         ["type", command] => {
             if COMMANDS.contains(&command) {
                 println!("{} is a shell builtin", command);
