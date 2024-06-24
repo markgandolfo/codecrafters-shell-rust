@@ -35,6 +35,47 @@ fn pwd() -> String {
     env::current_dir().unwrap().to_string_lossy().to_string()
 }
 
+fn chdir(dir: &str) {
+    if dir.starts_with("/") {
+        if let Err(_e) = env::set_current_dir(dir) {
+            eprintln!("cd: {}: No such file or directory", dir);
+        }
+    } else if dir.starts_with("./") {
+        let pwd = pwd();
+        let new_dir = format!("{}/{}", pwd, &dir[2..]);
+        if let Err(_e) = env::set_current_dir(&new_dir) {
+            eprintln!("cd: {}: No such file or directory", new_dir);
+        }
+    } else if dir.starts_with("..") {
+        let count = dir.trim().split("/").collect::<Vec<&str>>().len();
+        let pwd = pwd();
+        let pwd = pwd.split("/").collect::<Vec<&str>>();
+        let new_dir = pwd[..pwd.len() - count + 1].join("/");
+        if new_dir.is_empty() {
+            let new_dir = "/".to_string();
+            if let Err(_e) = env::set_current_dir(&new_dir) {
+                eprintln!("cd: {}: No such file or directory", new_dir);
+            }
+        } else {
+            if let Err(_e) = env::set_current_dir(&new_dir) {
+                eprintln!("cd: {}: No such file or directory", new_dir);
+            }
+        }
+    } else if dir == "~" {
+        let home = env::var("HOME").unwrap_or_else(|_| "".to_string());
+        let new_dir = format!("{}/", home);
+        if let Err(_e) = env::set_current_dir(&new_dir) {
+            eprintln!("cd: {}: No such file or directory", new_dir);
+        }
+    } else {
+        let pwd = pwd();
+        let new_dir = format!("{}/{}", pwd, dir);
+        if let Err(_e) = env::set_current_dir(&new_dir) {
+            eprintln!("cd: {}: No such file or directory", new_dir);
+        }
+    }
+}
+
 fn handle_input(input: &str) {
     let input: Vec<&str> = input.split_whitespace().collect();
 
@@ -42,11 +83,7 @@ fn handle_input(input: &str) {
         ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
         ["echo", ..] => println!("{}", input[1..].join(" ")),
         ["pwd"] => println!("{}", pwd()),
-        ["cd", dir] => {
-            if let Err(_e) = env::set_current_dir(dir) {
-                eprintln!("cd: {}: No such file or directory", dir);
-            }
-        }
+        ["cd", dir] => chdir(dir),
         ["type", command] => {
             if COMMANDS.contains(&command) {
                 println!("{} is a shell builtin", command);
