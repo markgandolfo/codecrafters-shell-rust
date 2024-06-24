@@ -42,6 +42,11 @@ fn handle_input(input: &str) {
         ["exit", code] => std::process::exit(code.parse().unwrap_or(0)),
         ["echo", ..] => println!("{}", input[1..].join(" ")),
         ["pwd"] => println!("{}", pwd()),
+        ["cd", dir] => {
+            if let Err(_e) = env::set_current_dir(dir) {
+                eprintln!("cd: {}: No such file or directory", dir);
+            }
+        }
         ["type", command] => {
             if COMMANDS.contains(&command) {
                 println!("{} is a shell builtin", command);
